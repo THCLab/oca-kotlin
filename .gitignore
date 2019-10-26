@@ -7,3 +7,4 @@
 /captures
 app/node_modules
 app/dist
+app/yarn-error.log
