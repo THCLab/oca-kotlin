@@ -1,4 +1,5 @@
 package com.thehumancolossuslab.odca
 
-data class AClass(var x: Int) {
+fun main() {
+    AClass(5)
 }

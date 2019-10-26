@@ -1,0 +1,17 @@
+{
+  "name": "AnApp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "html-webpack-plugin": "^3.2.0",
+    "odca": "file:../build/js/packages/odca-kotlin/",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.9.0"
+  },
+  "scripts": {
+    "dev": "webpack --mode development",
+    "serve": "webpack-dev-server --mode development"
+  }
+}

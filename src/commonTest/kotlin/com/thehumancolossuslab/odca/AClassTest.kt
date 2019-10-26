@@ -1,5 +1,6 @@
-package com.thehumancolossuslab.odca.kotlin
+package com.thehumancolossuslab.odca
 
+import com.thehumancolossuslab.odca.AClass
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import kotlin.test.assertEquals

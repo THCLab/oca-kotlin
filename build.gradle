@@ -15,7 +15,7 @@ plugins {
 }
 
 group 'com.thehumancolossuslab'
-version '1.0-SNAPSHOT'
+version '0.0.1'
 
 sourceCompatibility = 1.8
 
@@ -25,16 +25,20 @@ repositories {
     maven { url "https://dl.bintray.com/spekframework/spek-dev" }
 }
 
-kotlin {
-}
-
 repositories {
     mavenCentral()
 }
 
 kotlin {
     jvm()
-    js()
+    js {
+    }.compilations.all {
+        kotlinOptions.moduleKind = "commonjs"
+        kotlinOptions.sourceMap = false
+        kotlinOptions.outputFile = "$project.buildDir.path/js/packages/${project.name}/lib/odca.js"
+        kotlinOptions.main = "noCall"
+        kotlinOptions.metaInfo = true
+    }
 
     sourceSets {
         commonMain {
@@ -88,3 +92,18 @@ jvmTest {
     }
 }
 
+task packageJSON(){
+    doLast {
+        new File("$buildDir/js/packages/${project.name}", "package.json").text = """{
+  "name": "odca",
+  "version": "$version",
+  "main": "./lib/odca",
+  "dependencies": {
+    "kotlin": "^$kotlin_version"
+  }
+}
+"""
+    }
+}
+
+build.dependsOn packageJSON
