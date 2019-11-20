@@ -1,27 +1,26 @@
 package com.thehumancolossuslab.odca
 
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.*
 
 object Hello {
     @JvmStatic
     fun main(args : Array<String>) {
-        val json = """
-        {
-            "schemaBase": {
-              "@context": "https://odca.tech/v1",
-              "name": "AuditOverview",
-              "type": "spec/schema_base/1.0",
-              "description": "A schema to be used by audit contractors and suppliers to capture general audit report information, including the contact details of all audit participants",
-              "classification": "GICS:35202010",
-              "issued_by": "",
-              "attributes": {
-                "auditReportNumber": "Text", "auditReportOwner": "Text", "auditDate": "Date", "auditType": "Text", "auditTypeSpecify": "Text", "previousAuditDate": "Date", "previousAuditType": "Text", "previousAuditTypeSpecify": "Text", "auditFirmName": "Text", "leadAuditorName": "Text", "leadAuditorJobTitle": "Text", "furtherAuditorNames": "Array[Text]", "furtherAuditorJobTitles": "Array[Text]", "leadAuditorPhoneNumber": "Text", "leadAuditorEmail": "Text", "companyName": "Text", "siteName": "Text", "parentCompanyName": "Text", "siteAddress": "Text", "siteCity": "Text", "siteState": "Text", "sitePostalCode": "Text", "siteCountry": "Text", "siteRepresentativeName": "Text", "siteRepresentativeJobTitle": "Text", "siteRepresentativePhoneNumber": "Text", "siteRepresentativeEmailAddress": "Text", "managementRepresentativeName": "Text", "managementRepresentativeJobTitle": "Text", "hseRepresentativeName": "Text", "hseRepresentativeJobTitle": "Text", "hrRepresentativeName": "Text", "hrRepresentativeJobTitle": "Text", "findingClassificationMethod": "Text", "workersAttitude": "Text", "managementAttitude": "Text", "keyFindingsSummary": "Text"
-              },
-              "pii_attributes": [
-                "auditReportNumber", "auditReportOwner", "auditDate", "auditTypeSpecify", "previousAuditDate", "previousAuditTypeSpecify", "auditFirmName", "leadAuditorName", "leadAuditorJobTitle", "furtherAuditorNames", "furtherAuditorJobTitles", "leadAuditorPhoneNumber", "leadAuditorEmail", "companyName", "siteName", "parentCompanyName", "siteAddress", "sitePostalCode", "siteRepresentativeName", "siteRepresentativeJobTitle", "siteRepresentativePhoneNumber", "siteRepresentativeEmailAddress", "managementRepresentativeName", "managementRepresentativeJobTitle", "hseRepresentativeName", "hseRepresentativeJobTitle", "hrRepresentativeName", "hrRepresentativeJobTitle", "keyFindingsSummary"
-              ]
-            },
-            "LabelOverlay-hl:dMDmaoE4iejcsvNypLj1E5Wf4eejapmdXNgffrHdAVeG.json": {
+      val schemasArray = listOf(
+      hashMapOf("schemaBase" to """{
+          "@context": "https://odca.tech/v1",
+          "name": "AuditOverview",
+          "type": "spec/schema_base/1.0",
+          "description": "A schema to be used by audit contractors and suppliers to capture general audit report information, including the contact details of all audit participants",
+          "classification": "GICS:35202010",
+          "issued_by": "",
+          "attributes": {
+            "auditReportNumber": "Text", "auditReportOwner": "Text", "auditDate": "Date", "auditType": "Text", "auditTypeSpecify": "Text", "previousAuditDate": "Date", "previousAuditType": "Text", "previousAuditTypeSpecify": "Text", "auditFirmName": "Text", "leadAuditorName": "Text", "leadAuditorJobTitle": "Text", "furtherAuditorNames": "Array[Text]", "furtherAuditorJobTitles": "Array[Text]", "leadAuditorPhoneNumber": "Text", "leadAuditorEmail": "Text", "companyName": "Text", "siteName": "Text", "parentCompanyName": "Text", "siteAddress": "Text", "siteCity": "Text", "siteState": "Text", "sitePostalCode": "Text", "siteCountry": "Text", "siteRepresentativeName": "Text", "siteRepresentativeJobTitle": "Text", "siteRepresentativePhoneNumber": "Text", "siteRepresentativeEmailAddress": "Text", "managementRepresentativeName": "Text", "managementRepresentativeJobTitle": "Text", "hseRepresentativeName": "Text", "hseRepresentativeJobTitle": "Text", "hrRepresentativeName": "Text", "hrRepresentativeJobTitle": "Text", "findingClassificationMethod": "Text", "workersAttitude": "Text", "managementAttitude": "Text", "keyFindingsSummary": "Text"
+          },
+          "pii_attributes": [
+            "auditReportNumber", "auditReportOwner", "auditDate", "auditTypeSpecify", "previousAuditDate", "previousAuditTypeSpecify", "auditFirmName", "leadAuditorName", "leadAuditorJobTitle", "furtherAuditorNames", "furtherAuditorJobTitles", "leadAuditorPhoneNumber", "leadAuditorEmail", "companyName", "siteName", "parentCompanyName", "siteAddress", "sitePostalCode", "siteRepresentativeName", "siteRepresentativeJobTitle", "siteRepresentativePhoneNumber", "siteRepresentativeEmailAddress", "managementRepresentativeName", "managementRepresentativeJobTitle", "hseRepresentativeName", "hseRepresentativeJobTitle", "hrRepresentativeName", "hrRepresentativeJobTitle", "keyFindingsSummary"
+          ]
+        }""",
+      "LabelOverlay-hl:dMDmaoE4iejcsvNypLj1E5Wf4eejapmdXNgffrHdAVeG.json" to """{
               "@context": "https://odca.tech/overlays/v1",
               "type": "spec/overlay/label/1.0",
               "description": "Category and attribute labels for AuditOverview",
@@ -53,25 +52,24 @@ object Hello {
                   "findingClassificationMethod"
                 ]
               }
-            },
-            "FormatOverlay-hl:2yvBBHiSE24pBdBFAThAcQq9konLSGkDnPynSbZjq1TZ.json": {
-              "@context": "https://odca.tech/overlays/v1",
-              "type": "spec/overlay/format/1.0",
-              "description": "Attribute formats for AuditOverview",
-              "issued_by": "",
-              "role": "",
-              "purpose": "",
-              "schema_base": "hl:i2GRPzKQMxhGE4TM3kVqg3gYt3Wgt5agRLs16PEG2DSf",
-              "attr_formats": {
-                "auditDate": "DD/MM/YYYY", "previousAuditDate": "DD/MM/YYYY"
-              }
-            }
-        }"""
+            }""",
+        "FormatOverlay-hl:2yvBBHiSE24pBdBFAThAcQq9konLSGkDnPynSbZjq1TZ.json" to """{
+          "@context": "https://odca.tech/overlays/v1",
+          "type": "spec/overlay/format/1.0",
+          "description": "Attribute formats for AuditOverview",
+          "issued_by": "",
+          "role": "",
+          "purpose": "",
+          "schema_base": "hl:i2GRPzKQMxhGE4TM3kVqg3gYt3Wgt5agRLs16PEG2DSf",
+          "attr_formats": {
+            "auditDate": "DD/MM/YYYY", "previousAuditDate": "DD/MM/YYYY"
+          }
+        }""")).toTypedArray()
 
+        var facade = Facade()
+        val schemas = facade.deserializeSchemas(schemasArray)
+        val schema = schemas.first()
 
-        val deserializer = Deserializer(json)
-        println(
-          deserializer.execute()
-          )
+        println(schema.schemaBase)
     }
 }
