@@ -29,8 +29,8 @@ class SchemasDeserializer(val schemasData: Array<HashMap<String, String>>) {
             schemas.add(
                 Schema(
                     schemaBase = schemaBase,
-                    labelOverlays = overlays.filterIsInstance<LabelOverlay>(),
-                    formatOverlays = overlays.filterIsInstance<FormatOverlay>()
+                    labelOverlays = overlays.filterIsInstance<LabelOverlay>().toMutableList(),
+                    formatOverlays = overlays.filterIsInstance<FormatOverlay>().toMutableList()
                 )
             )
         }

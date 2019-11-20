@@ -7,8 +7,8 @@ import kotlinx.serialization.*
 class Schema(
     val uuid: String = Random.nextLong(1, 999999999999999999).toString(),
     val schemaBase: SchemaBase,
-    val labelOverlays: List<LabelOverlay>,
-    val formatOverlays: List<FormatOverlay>
+    val labelOverlays: MutableList<LabelOverlay>,
+    val formatOverlays: MutableList<FormatOverlay>
 ) {
     init {
         schemaBase.attributesType.forEach {
@@ -55,6 +55,7 @@ class Schema(
             }
         }
     }
+
     @JsName("add")
     fun add(attribute: AttributeDto) {
         if (attribute.uuid.isNullOrEmpty() ||
@@ -65,14 +66,29 @@ class Schema(
         schemaBase.addAttribute(
             attribute.uuid, attribute.name, attribute.type, attribute.isPii
         )
+
+        val role = ""
+        val purpose = ""
+
         if (attribute.label != null) {
-            var labelOverlay = labelOverlays.find { it.role == "" && it.purpose == "" }
-            labelOverlay?.add(attribute.uuid, attribute.label)
+            var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
+            if (labelOverlay == null) {
+                labelOverlay = LabelOverlay(
+                    role = role, purpose = purpose, language = "en_US"
+                )
+                labelOverlays.add(labelOverlay)
+            }
+
+            labelOverlay.add(attribute.uuid, attribute.label)
         }
         
         if (attribute.format != null) {
-            var formatOverlay = formatOverlays.find { it.role == "" && it.purpose == "" }
-            formatOverlay?.add(attribute.uuid, attribute.format)
+            var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
+            if (formatOverlay == null) {
+                formatOverlay = FormatOverlay(role = role, purpose = purpose)
+                formatOverlays.add(formatOverlay)
+            }
+            formatOverlay.add(attribute.uuid, attribute.format)
         }
     }
 
@@ -82,14 +98,27 @@ class Schema(
             uuid, attribute.name, attribute.type, attribute.isPii
         )
 
+        val role = ""
+        val purpose = ""
+
         if (attribute.label != null) {
-            var labelOverlay = labelOverlays.find { it.role == "" && it.purpose == "" }
-            labelOverlay?.modify(uuid, attribute.label)
+            var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
+            if (labelOverlay == null) {
+                labelOverlay = LabelOverlay(
+                    role = role, purpose = purpose, language = "en_US"
+                )
+                labelOverlays.add(labelOverlay)
+            }
+            labelOverlay.modify(uuid, attribute.label)
         }
 
         if (attribute.format != null) {
-            var formatOverlay = formatOverlays.find { it.role == "" && it.purpose == "" }
-            formatOverlay?.modify(uuid, attribute.format)
+            var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
+            if (formatOverlay == null) {
+                formatOverlay = FormatOverlay(role = role, purpose = purpose)
+                formatOverlays.add(formatOverlay)
+            }
+            formatOverlay.modify(uuid, attribute.format)
         }
     }
 
@@ -97,10 +126,13 @@ class Schema(
     fun delete(uuid: String) {
         schemaBase.deleteAttribute(uuid)
 
-        var labelOverlay = labelOverlays.find { it.role == "" && it.purpose == "" }
+        val role = ""
+        val purpose = ""
+
+        var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
         labelOverlay?.delete(uuid)
 
-        var formatOverlay = formatOverlays.find { it.role == "" && it.purpose == "" }
+        var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
         formatOverlay?.delete(uuid)
     }
 }
