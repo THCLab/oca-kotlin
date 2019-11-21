@@ -36,8 +36,13 @@ data class SchemaBase(
             throw Exception("Attribute name '$attrName' is already set")
         }
 
-        deleteAttribute(uuid)
-        addAttribute(uuid, attrName, attrType, isPii)
+        attributesUuid.put(uuid, attrName)
+        attributesType.put(uuid, attrType)
+        if (isPii == false) {
+            piiAttributes.remove(uuid)
+        } else if (!piiAttributes.contains(uuid)) {
+            piiAttributes.add(uuid)
+        }
     }
 
     fun deleteAttribute(uuid: String) {

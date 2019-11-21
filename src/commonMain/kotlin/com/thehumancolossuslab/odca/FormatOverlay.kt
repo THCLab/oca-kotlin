@@ -10,7 +10,7 @@ data class FormatOverlay(
     @SerialName("issued_by") val issuedBy: String = "",
     val role: String,
     val purpose: String,
-    @SerialName("schema_base") val schemaBaseId: String = "",
+    @SerialName("schema_base") var schemaBaseId: String,
     @SerialName("attr_formats") val attrFormats: MutableMap<String, String> = mutableMapOf()
 ) {
     fun add(uuid: String, format: String) {

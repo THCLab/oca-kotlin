@@ -66,6 +66,13 @@ class Schema(
         schemaBase.addAttribute(
             attribute.uuid, attribute.name, attribute.type, attribute.isPii
         )
+        val schemaBaseLink = HashlinkGenerator.call(schemaBase)
+        labelOverlays.forEach { overlay ->
+            overlay.schemaBaseId = schemaBaseLink
+        }
+        formatOverlays.forEach { overlay ->
+            overlay.schemaBaseId = schemaBaseLink
+        }
 
         val role = ""
         val purpose = ""
@@ -74,7 +81,7 @@ class Schema(
             var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
             if (labelOverlay == null) {
                 labelOverlay = LabelOverlay(
-                    role = role, purpose = purpose, language = "en_US"
+                    role = role, purpose = purpose, language = "en_US", schemaBaseId = schemaBaseLink
                 )
                 labelOverlays.add(labelOverlay)
             }
@@ -85,7 +92,7 @@ class Schema(
         if (attribute.format != null) {
             var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
             if (formatOverlay == null) {
-                formatOverlay = FormatOverlay(role = role, purpose = purpose)
+                formatOverlay = FormatOverlay(role = role, purpose = purpose, schemaBaseId = schemaBaseLink)
                 formatOverlays.add(formatOverlay)
             }
             formatOverlay.add(attribute.uuid, attribute.format)
@@ -98,6 +105,14 @@ class Schema(
             uuid, attribute.name, attribute.type, attribute.isPii
         )
 
+        val schemaBaseLink = HashlinkGenerator.call(schemaBase)
+        labelOverlays.forEach { overlay ->
+            overlay.schemaBaseId = schemaBaseLink
+        }
+        formatOverlays.forEach { overlay ->
+            overlay.schemaBaseId = schemaBaseLink
+        }
+
         val role = ""
         val purpose = ""
 
@@ -105,7 +120,7 @@ class Schema(
             var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
             if (labelOverlay == null) {
                 labelOverlay = LabelOverlay(
-                    role = role, purpose = purpose, language = "en_US"
+                    role = role, purpose = purpose, language = "en_US", schemaBaseId = schemaBaseLink
                 )
                 labelOverlays.add(labelOverlay)
             }
@@ -115,7 +130,7 @@ class Schema(
         if (attribute.format != null) {
             var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
             if (formatOverlay == null) {
-                formatOverlay = FormatOverlay(role = role, purpose = purpose)
+                formatOverlay = FormatOverlay(role = role, purpose = purpose, schemaBaseId = schemaBaseLink)
                 formatOverlays.add(formatOverlay)
             }
             formatOverlay.modify(uuid, attribute.format)
@@ -125,6 +140,14 @@ class Schema(
     @JsName("delete")
     fun delete(uuid: String) {
         schemaBase.deleteAttribute(uuid)
+
+        val schemaBaseLink = HashlinkGenerator.call(schemaBase)
+        labelOverlays.forEach { overlay ->
+            overlay.schemaBaseId = schemaBaseLink
+        }
+        formatOverlays.forEach { overlay ->
+            overlay.schemaBaseId = schemaBaseLink
+        }
 
         val role = ""
         val purpose = ""

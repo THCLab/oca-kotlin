@@ -10,7 +10,7 @@ data class LabelOverlay(
     @SerialName("issued_by") val issuedBy: String = "",
     val role: String,
     val purpose: String,
-    @SerialName("schema_base") val schemaBaseId: String = "",
+    @SerialName("schema_base") var schemaBaseId: String,
     val language: String,
     @SerialName("attr_labels") val attrLabels: MutableMap<String, String> = mutableMapOf(),
     @SerialName("attr_categories") val attrCategories: MutableList<String> = mutableListOf(),
