@@ -1,7 +1,7 @@
 package com.thehumancolossuslab.odca
 
+import com.benasher44.uuid.uuid4
 import kotlinx.serialization.*
-import kotlin.random.*
 
 data class AttributeDto(
     val name: String, val type: String, val isPii: Boolean,
@@ -10,6 +10,6 @@ data class AttributeDto(
     val uuid: String
 
     init {
-        this.uuid = Random.nextLong(1, 999999999999999999).toString()
+        this.uuid = uuid4().toString()
     }
 }

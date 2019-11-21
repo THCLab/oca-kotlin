@@ -50,6 +50,7 @@ kotlin {
             dependencies {
                 implementation 'com.soywiz.korlibs.krypto:krypto:1.9.0'
                 implementation 'com.ionspin.kotlin:bignum:0.1.4-SNAPSHOT'
+                implementation 'com.benasher44:uuid:0.0.5'
                 implementation kotlin('stdlib')
                 implementation kotlin('stdlib-common')
                 implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$serialization_version"

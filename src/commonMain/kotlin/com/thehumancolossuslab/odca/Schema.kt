@@ -1,18 +1,18 @@
 package com.thehumancolossuslab.odca
 
+import com.benasher44.uuid.uuid4
 import kotlin.js.*
-import kotlin.random.*
 import kotlinx.serialization.*
 
 class Schema(
-    val uuid: String = Random.nextLong(1, 999999999999999999).toString(),
+    val uuid: String = uuid4().toString(),
     val schemaBase: SchemaBase,
     val labelOverlays: MutableList<LabelOverlay>,
     val formatOverlays: MutableList<FormatOverlay>
 ) {
     init {
         schemaBase.attributesType.forEach {
-            val uuid = Random.nextLong(1, 999999999999999999).toString()
+            val uuid = uuid4().toString()
             schemaBase.attributesUuid.put(uuid, it.key)
         }
         val tmpMap = schemaBase.attributesType.mapKeys { attr ->
