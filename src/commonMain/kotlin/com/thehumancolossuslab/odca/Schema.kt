@@ -63,9 +63,7 @@ class Schema(
             throw Exception("Attribute uuid, type are required: ${attribute}")
         }
 
-        schemaBase.addAttribute(
-            attribute.uuid, attribute.name, attribute.type, attribute.isPii
-        )
+        schemaBase.addAttribute(attribute)
         val schemaBaseLink = HashlinkGenerator.call(schemaBase)
         labelOverlays.forEach { overlay ->
             overlay.schemaBaseId = schemaBaseLink
@@ -86,7 +84,7 @@ class Schema(
                 labelOverlays.add(labelOverlay)
             }
 
-            labelOverlay.add(attribute.uuid, attribute.label)
+            labelOverlay.add(attribute)
         }
         
         if (attribute.format != null) {
@@ -95,15 +93,13 @@ class Schema(
                 formatOverlay = FormatOverlay(role = role, purpose = purpose, schemaBaseId = schemaBaseLink)
                 formatOverlays.add(formatOverlay)
             }
-            formatOverlay.add(attribute.uuid, attribute.format)
+            formatOverlay.add(attribute)
         }
     }
 
     @JsName("modify")
     fun modify(uuid: String, attribute: AttributeDto) {
-        schemaBase.modifyAttribute(
-            uuid, attribute.name, attribute.type, attribute.isPii
-        )
+        schemaBase.modifyAttribute(uuid, attribute)
 
         val schemaBaseLink = HashlinkGenerator.call(schemaBase)
         labelOverlays.forEach { overlay ->
@@ -124,7 +120,7 @@ class Schema(
                 )
                 labelOverlays.add(labelOverlay)
             }
-            labelOverlay.modify(uuid, attribute.label)
+            labelOverlay.modify(uuid, attribute)
         }
 
         if (attribute.format != null) {
@@ -133,7 +129,7 @@ class Schema(
                 formatOverlay = FormatOverlay(role = role, purpose = purpose, schemaBaseId = schemaBaseLink)
                 formatOverlays.add(formatOverlay)
             }
-            formatOverlay.modify(uuid, attribute.format)
+            formatOverlay.modify(uuid, attribute)
         }
     }
 

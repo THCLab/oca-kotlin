@@ -13,12 +13,14 @@ data class FormatOverlay(
     @SerialName("schema_base") var schemaBaseId: String,
     @SerialName("attr_formats") val attrFormats: MutableMap<String, String> = mutableMapOf()
 ) {
-    fun add(uuid: String, format: String) {
-        attrFormats.put(uuid, format)
+    fun add(attribute: AttributeDto) {
+        if (attribute.format == null) { throw Exception() }
+        attrFormats.put(attribute.uuid, attribute.format)
     }
 
-    fun modify(uuid: String, format: String) {
-        attrFormats.set(uuid, format)
+    fun modify(uuid: String, attribute: AttributeDto) {
+        if (attribute.format == null) { throw Exception() }
+        attrFormats.set(uuid, attribute.format)
     }
 
     fun delete(uuid: String) {

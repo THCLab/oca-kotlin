@@ -17,8 +17,9 @@ data class LabelOverlay(
     @SerialName("category_labels") val categoryLabels: MutableMap<String, String> = mutableMapOf(),
     @SerialName("category_attributes") val categoryAttributes: MutableMap<String, MutableList<String>> = mutableMapOf()
 ) { 
-    fun add(uuid: String, input: String) {
-        var (category, label) = splitInput(input)
+    fun add(attribute: AttributeDto, uuid: String = attribute.uuid) {
+        if (attribute.label == null) { throw Exception() }
+        var (category, label) = splitInput(attribute.label)
         
         attrLabels.put(uuid, label)
         if (category.isNotBlank()) {
@@ -29,9 +30,9 @@ data class LabelOverlay(
         }
     }
 
-    fun modify(uuid: String, input: String) {
+    fun modify(uuid: String, attribute: AttributeDto) {
         delete(uuid)
-        add(uuid, input)
+        add(attribute, uuid)
     }
 
     fun delete(uuid: String) {

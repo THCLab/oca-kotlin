@@ -15,30 +15,26 @@ data class SchemaBase(
     @SerialName("pii_attributes") val piiAttributes: MutableList<String>
 ) {
 
-    fun addAttribute(
-        uuid: String, attrName: String, attrType: String, isPii: Boolean?
-    ) {
-        attributesUuid.put(uuid, attrName)
-        attributesType.put(uuid, attrType)
-        if (isPii == true) {
-            piiAttributes.add(uuid)
+    fun addAttribute(attribute: AttributeDto) {
+        attributesUuid.put(attribute.uuid, attribute.name)
+        attributesType.put(attribute.uuid, attribute.type)
+        if (attribute.isPii == true) {
+            piiAttributes.add(attribute.uuid)
         }
     }
 
-    fun modifyAttribute(
-        uuid: String, attrName: String, attrType: String, isPii: Boolean
-    ) {
-        if (attrName.isBlank()) {
+    fun modifyAttribute(uuid: String, attribute: AttributeDto) {
+        if (attribute.name.isBlank()) {
             throw Exception("Attribute name cannot be empty")
         }
-        val uuidsByAttrName = attributesUuid.filterValues { it == attrName }.keys
+        val uuidsByAttrName = attributesUuid.filterValues { it == attribute.name }.keys
         if (!uuidsByAttrName.isEmpty() && !uuidsByAttrName.contains(uuid)) {
-            throw Exception("Attribute name '$attrName' is already set")
+            throw Exception("Attribute name '${attribute.name}' is already set")
         }
 
-        attributesUuid.put(uuid, attrName)
-        attributesType.put(uuid, attrType)
-        if (isPii == false) {
+        attributesUuid.put(uuid, attribute.name)
+        attributesType.put(uuid, attribute.type)
+        if (attribute.isPii == false) {
             piiAttributes.remove(uuid)
         } else if (!piiAttributes.contains(uuid)) {
             piiAttributes.add(uuid)
