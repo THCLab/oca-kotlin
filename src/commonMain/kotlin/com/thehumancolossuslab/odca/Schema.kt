@@ -15,6 +15,7 @@ class Schema(
     val formatOverlays = schemaDto.formatOverlays.map { FormatOverlay(it.value) }.toMutableList()
     val entryOverlays = schemaDto.entryOverlays.map { EntryOverlay(it.value) }.toMutableList()
     val encodeOverlays = schemaDto.encodeOverlays.map { EncodeOverlay(it.value) }.toMutableList()
+    val informationOverlays = schemaDto.informationOverlays.map { InformationOverlay(it.value) }.toMutableList()
 
     @UnstableDefault
     @ExperimentalUnsignedTypes
@@ -55,13 +56,22 @@ class Schema(
             )
             encodeOverlayDtos.put("EncodeOverlay-$hashlink", value)
         }
+        val informationOverlayDtos: MutableMap<String, InformationOverlayDto> = mutableMapOf()
+        informationOverlays.forEach {
+            val value = it.toDto(schemaBaseLink, schemaBase.attributesUuid)
+            val hashlink = HashlinkGenerator.call(
+                Json.stringify(InformationOverlayDto.serializer(), value)
+            )
+            informationOverlayDtos.put("InformationOverlay-$hashlink", value)
+        }
 
         return SchemaDto(
             schemaBaseDto,
             labelOverlayDtos.toMap(),
             formatOverlayDtos.toMap(),
             entryOverlayDtos.toMap(),
-            encodeOverlayDtos.toMap()
+            encodeOverlayDtos.toMap(),
+            informationOverlayDtos.toMap()
         )
     }
 
@@ -127,6 +137,15 @@ class Schema(
                 tmp.forEach { overlay.attrEncoding.put(it.key, it.value) }
             }
         }
+        if (informationOverlays.isNotEmpty()) {
+            informationOverlays.forEach { overlay ->
+                val tmp = overlay.attrInformation.mapKeys { information ->
+                    schemaBase.attributesUuid.filterValues { it == information.key }.keys.first()
+                }
+                overlay.attrInformation.clear()
+                tmp.forEach { overlay.attrInformation.put(it.key, it.value) }
+            }
+        }
     }
 
     @JsName("add")
@@ -190,6 +209,18 @@ class Schema(
                 encodeOverlays.add(encodeOverlay)
             }
             encodeOverlay.add(attribute)
+        }
+        if (attribute.information != null) {
+            var informationOverlay = informationOverlays.find { it.role == role && it.purpose == purpose }
+            if (informationOverlay == null) {
+                informationOverlay = InformationOverlay(
+                    InformationOverlayDto(
+                        role = role, purpose = purpose, language = "en_US"
+                    )
+                )
+                informationOverlays.add(informationOverlay)
+            }
+            informationOverlay.add(attribute)
         }
     }
 
@@ -263,6 +294,31 @@ class Schema(
             }
             encodeOverlay.modify(uuid, attribute)
         }
+
+        if (attribute.information != null) {
+            var modified = false
+            
+            for (overlay in informationOverlays) {
+                if (overlay.attrInformation.containsKey(uuid)) {
+                    overlay.modify(uuid, attribute)
+                    modified = true
+                    break
+                }
+            }
+
+            if (modified == false) {
+                var informationOverlay = informationOverlays.find { it.role == role && it.purpose == purpose }
+                if (informationOverlay == null) {
+                    informationOverlay = InformationOverlay(
+                        InformationOverlayDto(
+                            role = role, purpose = purpose, language = "en_US"
+                        )
+                    )
+                    informationOverlays.add(informationOverlay)
+                }
+                informationOverlay.add(attribute, uuid)
+            }
+        }
     }
 
     @JsName("delete")
@@ -284,5 +340,9 @@ class Schema(
 
         var encodeOverlay = encodeOverlays.find { it.role == role && it.purpose == purpose }
         encodeOverlay?.delete(uuid)
+
+        informationOverlays.forEach { overlay ->
+            overlay.delete(uuid)
+        }
     }
 }

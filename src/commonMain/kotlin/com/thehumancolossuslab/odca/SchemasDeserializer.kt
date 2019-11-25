@@ -26,6 +26,7 @@ class SchemasDeserializer(val schemasData: Array<HashMap<String, String>>) {
                     "FormatOverlay" -> overlays.put(it.key, json.parse(FormatOverlayDto.serializer(), it.value))
                     "EntryOverlay" -> overlays.put(it.key, json.parse(EntryOverlayDto.serializer(), it.value))
                     "EncodeOverlay" -> overlays.put(it.key, json.parse(EncodeOverlayDto.serializer(), it.value))
+                    "InformationOverlay" -> overlays.put(it.key, json.parse(InformationOverlayDto.serializer(), it.value))
                 }
             }
 
@@ -36,7 +37,8 @@ class SchemasDeserializer(val schemasData: Array<HashMap<String, String>>) {
                         labelOverlays = overlays.filter { it.value is LabelOverlayDto }.mapValues { it.value as LabelOverlayDto },
                         formatOverlays = overlays.filter { it.value is FormatOverlayDto }.mapValues { it.value as FormatOverlayDto },
                         entryOverlays = overlays.filter { it.value is EntryOverlayDto }.mapValues { it.value as EntryOverlayDto },
-                        encodeOverlays = overlays.filter { it.value is EncodeOverlayDto }.mapValues { it.value as EncodeOverlayDto }
+                        encodeOverlays = overlays.filter { it.value is EncodeOverlayDto }.mapValues { it.value as EncodeOverlayDto },
+                        informationOverlays = overlays.filter { it.value is InformationOverlayDto }.mapValues { it.value as InformationOverlayDto }
                     )
                 )
             )
