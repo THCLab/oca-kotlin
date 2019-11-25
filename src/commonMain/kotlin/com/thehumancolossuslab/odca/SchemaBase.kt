@@ -1,19 +1,41 @@
 package com.thehumancolossuslab.odca
 
-import kotlinx.serialization.*
-
-@Serializable
 data class SchemaBase(
-    @SerialName("@context") val context: String,
-    val name: String,
-    val type: String,
-    val description: String,
-    val classification: String,
-    @SerialName("issued_by") val issuedBy: String,
-    @SerialName("attributes") val attributesType: MutableMap<String, String>,
-    val attributesUuid: MutableMap<String, String> = mutableMapOf(),
-    @SerialName("pii_attributes") val piiAttributes: MutableList<String>
+    val schemaBaseDto: SchemaBaseDto
 ) {
+    val context: String = schemaBaseDto.context
+    val name: String = schemaBaseDto.name
+    val type: String = schemaBaseDto.type
+    val description: String = schemaBaseDto.description
+    val classification: String = schemaBaseDto.classification
+    val issuedBy: String = schemaBaseDto.issuedBy
+    var attributesType: MutableMap<String, String> = schemaBaseDto.attributes.toMutableMap()
+    var attributesUuid: MutableMap<String, String> = mutableMapOf()
+    var piiAttributes: MutableList<String> = schemaBaseDto.piiAttributes.toMutableList()
+
+    fun toDto(): SchemaBaseDto {
+        val attributes: MutableMap<String, String> = mutableMapOf()
+        attributesType.forEach {
+            val attrName = attributesUuid.get(it.key)
+            if (attrName.isNullOrBlank()) {
+                throw Exception("Attribute name for ${it.key} is ${attrName}")
+            }
+            attributes.put(attrName, it.value)
+        }
+
+        return SchemaBaseDto(
+            context = schemaBaseDto.context,
+            name = schemaBaseDto.name,
+            type = schemaBaseDto.type,
+            description = schemaBaseDto.description,
+            classification = schemaBaseDto.classification,
+            issuedBy = schemaBaseDto.issuedBy,
+            attributes = attributes.toMap(),
+            piiAttributes = piiAttributes.map {
+                attributesUuid.get(it) as String
+            }
+        )
+    }
 
     fun addAttribute(attribute: AttributeDto) {
         attributesUuid.put(attribute.uuid, attribute.name)

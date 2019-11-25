@@ -9,28 +9,31 @@ class SchemasDeserializer(val schemasData: Array<HashMap<String, String>>) {
         val schemas: MutableList<Schema> = mutableListOf()
 
         for (schemaData in schemasData) {
-            val schemaBase: SchemaBase
+            val schemaBase: SchemaBaseDto
             val schemaBaseJson = schemaData.remove("schemaBase")
 
             if (!schemaBaseJson.isNullOrBlank()) {
-                schemaBase = json.parse(SchemaBase.serializer(), schemaBaseJson)
+                schemaBase = json.parse(SchemaBaseDto.serializer(), schemaBaseJson)
             } else {
                 throw Exception("schemaBase is missing")
             }
 
-            val overlays = schemaData.map {
+            val overlays: MutableMap<String, Any> = mutableMapOf()
+
+            schemaData.forEach {
                 when (it.key.split("-")[0]) {
-                    "LabelOverlay" -> json.parse(LabelOverlay.serializer(), it.value)
-                    "FormatOverlay" -> json.parse(FormatOverlay.serializer(), it.value)
-                    else -> null
+                    "LabelOverlay" -> overlays.put(it.key, json.parse(LabelOverlayDto.serializer(), it.value))
+                    "FormatOverlay" -> overlays.put(it.key, json.parse(FormatOverlayDto.serializer(), it.value))
                 }
             }
 
             schemas.add(
                 Schema(
-                    schemaBase = schemaBase,
-                    labelOverlays = overlays.filterIsInstance<LabelOverlay>().toMutableList(),
-                    formatOverlays = overlays.filterIsInstance<FormatOverlay>().toMutableList()
+                    SchemaDto(
+                        schemaBase = schemaBase,
+                        labelOverlays = overlays.filter { it.value is LabelOverlayDto }.mapValues { it.value as LabelOverlayDto },
+                        formatOverlays = overlays.filter { it.value is FormatOverlayDto }.mapValues { it.value as FormatOverlayDto }
+                    )
                 )
             )
         }

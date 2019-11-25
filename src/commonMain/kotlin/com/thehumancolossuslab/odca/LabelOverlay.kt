@@ -2,21 +2,41 @@ package com.thehumancolossuslab.odca
 
 import kotlinx.serialization.*
 
-@Serializable
 data class LabelOverlay(
-    @SerialName("@context") val context: String = "https://odca.tech/overlays/v1",
-    val type: String = "spec/overlay/label/1.0",
-    val description: String = "",
-    @SerialName("issued_by") val issuedBy: String = "",
-    val role: String,
-    val purpose: String,
-    @SerialName("schema_base") var schemaBaseId: String,
-    val language: String,
-    @SerialName("attr_labels") val attrLabels: MutableMap<String, String> = mutableMapOf(),
-    @SerialName("attr_categories") val attrCategories: MutableList<String> = mutableListOf(),
-    @SerialName("category_labels") val categoryLabels: MutableMap<String, String> = mutableMapOf(),
-    @SerialName("category_attributes") val categoryAttributes: MutableMap<String, MutableList<String>> = mutableMapOf()
+    private val labelOverlayDto: LabelOverlayDto
 ) { 
+    val role = labelOverlayDto.role
+    val purpose = labelOverlayDto.purpose
+    val attrLabels: MutableMap<String, String> = labelOverlayDto.attrLabels.toMutableMap()
+    val attrCategories: MutableList<String> = labelOverlayDto.attrCategories.toMutableList()
+    val categoryLabels: MutableMap<String, String> = labelOverlayDto.categoryLabels.toMutableMap()
+    val categoryAttributes: MutableMap<String, MutableList<String>> = labelOverlayDto.categoryAttributes.toMutableMap()
+
+    fun toDto(schemaBaseId: String, attributesUuid: MutableMap<String, String>): LabelOverlayDto {
+        val categoryAttrs: MutableMap<String, MutableList<String>> = mutableMapOf()
+        categoryAttributes.forEach {
+            val value = it.value.map { attributesUuid.get(it) as String }
+            categoryAttrs.put(it.key, value.toMutableList())
+        }
+
+        return LabelOverlayDto(
+            context = labelOverlayDto.context,
+            type = labelOverlayDto.type,
+            description = labelOverlayDto.description,
+            issuedBy = labelOverlayDto.issuedBy,
+            role = role,
+            purpose = purpose,
+            schemaBaseId = schemaBaseId,
+            language = labelOverlayDto.language,
+            attrLabels = attrLabels.mapKeys {
+                attributesUuid[it.key] as String
+            },
+            attrCategories = attrCategories,
+            categoryLabels = categoryLabels,
+            categoryAttributes = categoryAttrs
+        )
+    }
+
     fun add(attribute: AttributeDto, uuid: String = attribute.uuid) {
         if (attribute.label == null) { throw Exception() }
         var (category, label) = splitInput(attribute.label)

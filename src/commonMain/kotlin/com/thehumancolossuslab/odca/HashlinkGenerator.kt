@@ -2,22 +2,22 @@ package com.thehumancolossuslab.odca
 
 import com.ionspin.kotlin.bignum.integer.toBigInteger
 import com.soywiz.krypto.SHA256
-import kotlinx.serialization.json.Json
 
+@ExperimentalUnsignedTypes
 object HashlinkGenerator {
     @UseExperimental(ExperimentalStdlibApi::class)
-    fun call(schemaBase: SchemaBase): String {
+    fun call(input: String): String {
         val hex = SHA256.digest(
-            Json.stringify(SchemaBase.serializer(), schemaBase).encodeToByteArray()
+            input.encodeToByteArray()
         ).joinToString(separator = "") {
             it.toInt().and(0xff).toString(16).padStart(2, '0')
         }.toBigInteger(16).toByteArray()
 
         val link = ByteArray(hex.size, { int -> hex[int] }).encodeToBase58String()
-        return "hl:${link}"
+        return "hl:$link"
     }
 
-    fun ByteArray.encodeToBase58String(): String {
+    private fun ByteArray.encodeToBase58String(): String {
         val alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
         val ENCODED_ZERO = alphabet[0]
 
@@ -40,9 +40,6 @@ object HashlinkGenerator {
         }
         while (outputStart < encoded.size && encoded[outputStart] == ENCODED_ZERO) {
             ++outputStart
-        }
-        while (--zeros >= 0) {
-            encoded[--outputStart] = ENCODED_ZERO
         }
         return String(encoded, outputStart, encoded.size - outputStart)
     }

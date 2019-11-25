@@ -2,17 +2,28 @@ package com.thehumancolossuslab.odca
 
 import kotlinx.serialization.*
 
-@Serializable
 data class FormatOverlay(
-    @SerialName("@context") val context: String = "https://odca.tech/overlays/v1",
-    val type: String = "spec/overlay/format/1.0",
-    val description: String = "",
-    @SerialName("issued_by") val issuedBy: String = "",
-    val role: String,
-    val purpose: String,
-    @SerialName("schema_base") var schemaBaseId: String,
-    @SerialName("attr_formats") val attrFormats: MutableMap<String, String> = mutableMapOf()
+    private val formatOverlayDto: FormatOverlayDto
 ) {
+    val role = formatOverlayDto.role
+    val purpose = formatOverlayDto.purpose
+    val attrFormats: MutableMap<String, String> = formatOverlayDto.attrFormats.toMutableMap()
+
+    fun toDto(schemaBaseId: String, attributesUuid: MutableMap<String, String>): FormatOverlayDto {
+        return FormatOverlayDto(
+            context = formatOverlayDto.context,
+            type = formatOverlayDto.type,
+            description = formatOverlayDto.description,
+            issuedBy = formatOverlayDto.issuedBy,
+            role = role,
+            purpose = purpose,
+            schemaBaseId = schemaBaseId,
+            attrFormats = attrFormats.mapKeys {
+                attributesUuid[it.key] as String
+            }
+        )
+    }
+
     fun add(attribute: AttributeDto) {
         if (attribute.format == null) { throw Exception() }
         attrFormats.put(attribute.uuid, attribute.format)

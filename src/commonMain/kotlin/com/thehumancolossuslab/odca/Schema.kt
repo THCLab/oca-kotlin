@@ -3,13 +3,48 @@ package com.thehumancolossuslab.odca
 import com.benasher44.uuid.uuid4
 import kotlin.js.*
 import kotlinx.serialization.*
+import kotlinx.serialization.json.Json
 
 class Schema(
-    val uuid: String = uuid4().toString(),
-    val schemaBase: SchemaBase,
-    val labelOverlays: MutableList<LabelOverlay>,
-    val formatOverlays: MutableList<FormatOverlay>
+    private val schemaDto: SchemaDto,
+    val uuid: String = uuid4().toString()
 ) {
+    val schemaBase = SchemaBase(schemaDto.schemaBase)
+
+    val labelOverlays = schemaDto.labelOverlays.map { LabelOverlay(it.value) }.toMutableList()
+    val formatOverlays = schemaDto.formatOverlays.map { FormatOverlay(it.value) }.toMutableList()
+
+    @UnstableDefault
+    @ExperimentalUnsignedTypes
+    fun toDto(): SchemaDto {
+        val schemaBaseDto = schemaBase.toDto()
+        val schemaBaseLink = HashlinkGenerator.call(
+            Json.stringify(SchemaBaseDto.serializer(), schemaBaseDto)
+        )
+        val labelOverlayDtos: MutableMap<String, LabelOverlayDto> = mutableMapOf()
+        labelOverlays.forEach {
+            val value = it.toDto(schemaBaseLink, schemaBase.attributesUuid)
+            val hashlink = HashlinkGenerator.call(
+                Json.stringify(LabelOverlayDto.serializer(), value)
+            )
+            labelOverlayDtos.put("LabelOverlay-$hashlink", value)
+        }
+        val formatOverlayDtos: MutableMap<String, FormatOverlayDto> = mutableMapOf()
+        formatOverlays.forEach {
+            val value = it.toDto(schemaBaseLink, schemaBase.attributesUuid)
+            val hashlink = HashlinkGenerator.call(
+                Json.stringify(FormatOverlayDto.serializer(), value)
+            )
+            formatOverlayDtos.put("FormatOverlay-$hashlink", value)
+        }
+
+        return SchemaDto(
+            schemaBaseDto,
+            labelOverlayDtos.toMap(),
+            formatOverlayDtos.toMap()
+        )
+    }
+
     init {
         schemaBase.attributesType.forEach {
             val uuid = uuid4().toString()
@@ -60,17 +95,10 @@ class Schema(
     fun add(attribute: AttributeDto) {
         if (attribute.uuid.isNullOrEmpty() ||
             attribute.type.isNullOrEmpty()) {
-            throw Exception("Attribute uuid, type are required: ${attribute}")
+            throw Exception("Attribute uuid, type are required: $attribute")
         }
 
         schemaBase.addAttribute(attribute)
-        val schemaBaseLink = HashlinkGenerator.call(schemaBase)
-        labelOverlays.forEach { overlay ->
-            overlay.schemaBaseId = schemaBaseLink
-        }
-        formatOverlays.forEach { overlay ->
-            overlay.schemaBaseId = schemaBaseLink
-        }
 
         val role = ""
         val purpose = ""
@@ -79,18 +107,24 @@ class Schema(
             var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
             if (labelOverlay == null) {
                 labelOverlay = LabelOverlay(
-                    role = role, purpose = purpose, language = "en_US", schemaBaseId = schemaBaseLink
+                    LabelOverlayDto(
+                        role = role, purpose = purpose, language = "en_US"
+                    )
                 )
                 labelOverlays.add(labelOverlay)
             }
 
             labelOverlay.add(attribute)
         }
-        
+
         if (attribute.format != null) {
             var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
             if (formatOverlay == null) {
-                formatOverlay = FormatOverlay(role = role, purpose = purpose, schemaBaseId = schemaBaseLink)
+                formatOverlay = FormatOverlay(
+                    FormatOverlayDto(
+                        role = role, purpose = purpose
+                    )
+                )
                 formatOverlays.add(formatOverlay)
             }
             formatOverlay.add(attribute)
@@ -101,14 +135,6 @@ class Schema(
     fun modify(uuid: String, attribute: AttributeDto) {
         schemaBase.modifyAttribute(uuid, attribute)
 
-        val schemaBaseLink = HashlinkGenerator.call(schemaBase)
-        labelOverlays.forEach { overlay ->
-            overlay.schemaBaseId = schemaBaseLink
-        }
-        formatOverlays.forEach { overlay ->
-            overlay.schemaBaseId = schemaBaseLink
-        }
-
         val role = ""
         val purpose = ""
 
@@ -116,7 +142,9 @@ class Schema(
             var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
             if (labelOverlay == null) {
                 labelOverlay = LabelOverlay(
-                    role = role, purpose = purpose, language = "en_US", schemaBaseId = schemaBaseLink
+                    LabelOverlayDto(
+                        role = role, purpose = purpose, language = "en_US"
+                    )
                 )
                 labelOverlays.add(labelOverlay)
             }
@@ -126,7 +154,11 @@ class Schema(
         if (attribute.format != null) {
             var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
             if (formatOverlay == null) {
-                formatOverlay = FormatOverlay(role = role, purpose = purpose, schemaBaseId = schemaBaseLink)
+                formatOverlay = FormatOverlay(
+                    FormatOverlayDto(
+                        role = role, purpose = purpose
+                    )
+                )
                 formatOverlays.add(formatOverlay)
             }
             formatOverlay.modify(uuid, attribute)
@@ -136,14 +168,6 @@ class Schema(
     @JsName("delete")
     fun delete(uuid: String) {
         schemaBase.deleteAttribute(uuid)
-
-        val schemaBaseLink = HashlinkGenerator.call(schemaBase)
-        labelOverlays.forEach { overlay ->
-            overlay.schemaBaseId = schemaBaseLink
-        }
-        formatOverlays.forEach { overlay ->
-            overlay.schemaBaseId = schemaBaseLink
-        }
 
         val role = ""
         val purpose = ""
