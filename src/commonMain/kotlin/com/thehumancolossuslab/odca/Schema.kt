@@ -13,6 +13,7 @@ class Schema(
 
     val labelOverlays = schemaDto.labelOverlays.map { LabelOverlay(it.value) }.toMutableList()
     val formatOverlays = schemaDto.formatOverlays.map { FormatOverlay(it.value) }.toMutableList()
+    val entryOverlays = schemaDto.entryOverlays.map { EntryOverlay(it.value) }.toMutableList()
 
     @UnstableDefault
     @ExperimentalUnsignedTypes
@@ -37,11 +38,20 @@ class Schema(
             )
             formatOverlayDtos.put("FormatOverlay-$hashlink", value)
         }
+        val entryOverlayDtos: MutableMap<String, EntryOverlayDto> = mutableMapOf()
+        entryOverlays.forEach {
+            val value = it.toDto(schemaBaseLink, schemaBase.attributesUuid)
+            val hashlink = HashlinkGenerator.call(
+                Json.stringify(EntryOverlayDto.serializer(), value)
+            )
+            entryOverlayDtos.put("EntryOverlay-$hashlink", value)
+        }
 
         return SchemaDto(
             schemaBaseDto,
             labelOverlayDtos.toMap(),
-            formatOverlayDtos.toMap()
+            formatOverlayDtos.toMap(),
+            entryOverlayDtos.toMap()
         )
     }
 
@@ -89,6 +99,15 @@ class Schema(
                 tmp.forEach { overlay.attrFormats.put(it.key, it.value) }
             }
         }
+        if (entryOverlays.isNotEmpty()) {
+            entryOverlays.forEach { overlay ->
+                val tmp = overlay.attrEntries.mapKeys { entries ->
+                    schemaBase.attributesUuid.filterValues { it == entries.key }.keys.first()
+                }
+                overlay.attrEntries.clear()
+                tmp.forEach { overlay.attrEntries.put(it.key, it.value) }
+            }
+        }
     }
 
     @JsName("add")
@@ -129,6 +148,18 @@ class Schema(
             }
             formatOverlay.add(attribute)
         }
+        if (attribute.entries != null) {
+            var entryOverlay = entryOverlays.find { it.role == role && it.purpose == purpose }
+            if (entryOverlay == null) {
+                entryOverlay = EntryOverlay(
+                    EntryOverlayDto(
+                        role = role, purpose = purpose, language = "en_US"
+                    )
+                )
+                entryOverlays.add(entryOverlay)
+            }
+            entryOverlay.add(attribute)
+        }
     }
 
     @JsName("modify")
@@ -163,6 +194,31 @@ class Schema(
             }
             formatOverlay.modify(uuid, attribute)
         }
+
+        if (attribute.entries != null) {
+            var modified = false
+            
+            for (overlay in entryOverlays) {
+                if (overlay.attrEntries.containsKey(uuid)) {
+                    overlay.modify(uuid, attribute)
+                    modified = true
+                    break
+                }
+            }
+
+            if (modified == false) {
+                var entryOverlay = entryOverlays.find { it.role == role && it.purpose == purpose }
+                if (entryOverlay == null) {
+                    entryOverlay = EntryOverlay(
+                        EntryOverlayDto(
+                            role = role, purpose = purpose, language = "en_US"
+                        )
+                    )
+                    entryOverlays.add(entryOverlay)
+                }
+                entryOverlay.add(attribute, uuid)
+            }
+        }
     }
 
     @JsName("delete")
@@ -177,5 +233,9 @@ class Schema(
 
         var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
         formatOverlay?.delete(uuid)
+
+        entryOverlays.forEach { overlay ->
+            overlay.delete(uuid)
+        }
     }
 }

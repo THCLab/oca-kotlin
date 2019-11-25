@@ -6,5 +6,6 @@ import kotlinx.serialization.*
 class SchemaDto(
     val schemaBase: SchemaBaseDto,
     val labelOverlays: Map<String, LabelOverlayDto>,
-    val formatOverlays: Map<String, FormatOverlayDto>
+    val formatOverlays: Map<String, FormatOverlayDto>,
+    val entryOverlays: Map<String, EntryOverlayDto>
 )
