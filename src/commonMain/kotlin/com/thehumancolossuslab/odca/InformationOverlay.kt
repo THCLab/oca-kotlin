@@ -13,7 +13,6 @@ data class InformationOverlay(
         return InformationOverlayDto(
             context = informationOverlayDto.context,
             type = informationOverlayDto.type,
-            description = informationOverlayDto.description,
             issuedBy = informationOverlayDto.issuedBy,
             role = role,
             purpose = purpose,

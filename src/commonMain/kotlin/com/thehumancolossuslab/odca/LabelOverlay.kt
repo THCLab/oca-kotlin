@@ -22,7 +22,6 @@ data class LabelOverlay(
         return LabelOverlayDto(
             context = labelOverlayDto.context,
             type = labelOverlayDto.type,
-            description = labelOverlayDto.description,
             issuedBy = labelOverlayDto.issuedBy,
             role = role,
             purpose = purpose,

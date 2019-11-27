@@ -6,7 +6,6 @@ import kotlinx.serialization.*
 data class FormatOverlayDto(
     @SerialName("@context") val context: String = "https://odca.tech/overlays/v1",
     val type: String = "spec/overlay/format/1.0",
-    val description: String = "",
     @SerialName("issued_by") val issuedBy: String = "",
     val role: String,
     val purpose: String,

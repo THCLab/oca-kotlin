@@ -13,7 +13,6 @@ data class EncodeOverlay(
         return EncodeOverlayDto(
             context = encodeOverlayDto.context,
             type = encodeOverlayDto.type,
-            description = encodeOverlayDto.description,
             issuedBy = encodeOverlayDto.issuedBy,
             role = role,
             purpose = purpose,

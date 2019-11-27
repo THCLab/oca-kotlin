@@ -13,7 +13,6 @@ data class EntryOverlay(
         return EntryOverlayDto(
             context = entryOverlayDto.context,
             type = entryOverlayDto.type,
-            description = entryOverlayDto.description,
             issuedBy = entryOverlayDto.issuedBy,
             role = role,
             purpose = purpose,

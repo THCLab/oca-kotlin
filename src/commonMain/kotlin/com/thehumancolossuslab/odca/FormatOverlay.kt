@@ -13,7 +13,6 @@ data class FormatOverlay(
         return FormatOverlayDto(
             context = formatOverlayDto.context,
             type = formatOverlayDto.type,
-            description = formatOverlayDto.description,
             issuedBy = formatOverlayDto.issuedBy,
             role = role,
             purpose = purpose,
