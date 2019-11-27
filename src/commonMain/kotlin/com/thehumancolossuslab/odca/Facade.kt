@@ -12,6 +12,13 @@ class Facade {
 
     @ExperimentalUnsignedTypes
     @UnstableDefault
+    @JsName("renderSchema")
+    fun renderSchema(baseInfo: HashMap<String, String>, attributes: Array<AttributeDto>): Schema {
+        return SchemaRenderer(baseInfo, attributes).call()
+    }
+
+    @ExperimentalUnsignedTypes
+    @UnstableDefault
     @JsName("serialize")
     fun serialize(schema: Schema): String {
         return Json.stringify(SchemaDto.serializer(), schema.toDto())
