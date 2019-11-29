@@ -18,7 +18,7 @@ plugins {
 }
 
 group 'com.thehumancolossuslab'
-version '0.0.1'
+version '0.0.6'
 
 sourceCompatibility = 1.8
 
@@ -122,8 +122,19 @@ task packageJSON(){
   "name": "odca",
   "version": "$version",
   "main": "./lib/odca",
+    "scripts": {
+    "preinstall": "command -v link-module-alias && link-module-alias clean || true",
+    "postinstall": "link-module-alias"
+  },
+  "_moduleAliases": {
+    "kotlinx-serialization-kotlinx-serialization-runtime": "dependencies/kotlinx-serialization-kotlinx-serialization-runtime/$serialization_version",
+    "bignum": "dependencies/bignum/0.1.4-SNAPSHOT",
+    "krypto-root-krypto": "dependencies/krypto-root-krypto/1.9.0",
+    "uuid": "dependencies/uuid/0.0.5"
+  },
   "dependencies": {
-    "kotlin": "^$kotlin_version"
+    "kotlin": "^$kotlin_version",
+    "link-module-alias": "^1.2.0"
   }
 }
 """
