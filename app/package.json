@@ -5,7 +5,8 @@
   "license": "MIT",
   "dependencies": {
     "html-webpack-plugin": "^3.2.0",
-    "odca": "file:../build/js/packages/odca-kotlin/",
+    "jszip": "^3.2.2",
+    "odca": ">=0.0.6",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.9.0"
