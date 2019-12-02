@@ -37,16 +37,33 @@ data class LabelOverlay(
     }
 
     fun add(attribute: AttributeDto, uuid: String = attribute.uuid) {
-        if (attribute.label == null) { throw Exception() }
-        var (category, label) = splitInput(attribute.label)
+        if (attribute.label == null || attribute.categories == null) {
+            throw Exception()
+        }
+        val label = attribute.label
+        val categories = attribute.categories
         
         attrLabels.put(uuid, label)
-        if (category.isNotBlank()) {
-            var categoryAttr = snakeCase(category)
-            attrCategories.add(categoryAttr)
-            categoryLabels.put(categoryAttr, category)
-            categoryAttributes.getOrPut(categoryAttr) { mutableListOf() }.add(uuid)
+
+        val category = categories.last()
+        val supercategories = categories.dropLast(1)
+
+        var supercategoryNumbers : MutableList<String> = mutableListOf()
+        for (supercategory in supercategories) {
+            val supercategoryAttr = getOrCreateCategoryAttr(supercategoryNumbers, supercategory)
+            supercategoryNumbers.add(supercategoryAttr.dropLast(1).last().toString())
+            if (supercategoryAttr !in attrCategories) {
+                attrCategories.add(supercategoryAttr)
+            }
+            categoryLabels.put(supercategoryAttr, supercategory)
         }
+
+        var categoryAttr = getOrCreateCategoryAttr(supercategoryNumbers, category)
+        if (categoryAttr !in attrCategories) {
+            attrCategories.add(categoryAttr)
+        }
+        categoryLabels.put(categoryAttr, category)
+        categoryAttributes.getOrPut(categoryAttr) { mutableListOf() }.add(uuid)
     }
 
     fun modify(uuid: String, attribute: AttributeDto) {
@@ -73,15 +90,22 @@ data class LabelOverlay(
         }
     }
 
-    private fun splitInput(input: String) : List<String> {
-        var result = input.split("|").map { it.trim() }
-        if (result.size == 1) {
-            result = listOf("") + result
-        }
-        return result
-    }
+    private fun getOrCreateCategoryAttr(supercategoryNumbers: List<String>, category: String) : String {
+        val nestedCategoryNumbers = if (supercategoryNumbers.size > 0)
+            ("_" + supercategoryNumbers.joinToString("_") + "_") else "_"
 
-    private fun snakeCase(input: String) : String {
-        return input.toLowerCase().replace(" ", "_")
+        var categoryAttr = categoryLabels.filter {
+            it.value == category
+            && it.key.matches(Regex("_category$nestedCategoryNumbers[1-9]_"))
+        }.keys
+
+        if (categoryAttr.size > 0) {
+            return categoryAttr.first()
+        } else {
+            val subcategoryNumber = categoryLabels.count {
+                it.key.matches(Regex("_category$nestedCategoryNumbers[1-9]_"))
+            } + 1
+            return "_category${nestedCategoryNumbers}${subcategoryNumber}_"
+        }
     }
 }
