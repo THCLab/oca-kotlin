@@ -14,7 +14,7 @@ class Schema(
     val labelOverlays = schemaDto.labelOverlays.map { LabelOverlay(it.value) }.toMutableList()
     val formatOverlays = schemaDto.formatOverlays.map { FormatOverlay(it.value) }.toMutableList()
     val entryOverlays = schemaDto.entryOverlays.map { EntryOverlay(it.value) }.toMutableList()
-    val encodeOverlays = schemaDto.encodeOverlays.map { EncodeOverlay(it.value) }.toMutableList()
+    val characterEncodingOverlays = schemaDto.characterEncodingOverlays.map { CharacterEncodingOverlay(it.value) }.toMutableList()
     val informationOverlays = schemaDto.informationOverlays.map { InformationOverlay(it.value) }.toMutableList()
 
     @UnstableDefault
@@ -48,13 +48,13 @@ class Schema(
             )
             entryOverlayDtos.put("EntryOverlay-$hashlink", value)
         }
-        val encodeOverlayDtos: MutableMap<String, EncodeOverlayDto> = mutableMapOf()
-        encodeOverlays.forEach {
+        val characterEncodingOverlayDtos: MutableMap<String, CharacterEncodingOverlayDto> = mutableMapOf()
+        characterEncodingOverlays.forEach {
             val value = it.toDto(schemaBaseLink, schemaBase.attributesUuid)
             val hashlink = HashlinkGenerator.call(
-                Json.stringify(EncodeOverlayDto.serializer(), value)
+                Json.stringify(CharacterEncodingOverlayDto.serializer(), value)
             )
-            encodeOverlayDtos.put("EncodeOverlay-$hashlink", value)
+            characterEncodingOverlayDtos.put("CharacterEncodingOverlay-$hashlink", value)
         }
         val informationOverlayDtos: MutableMap<String, InformationOverlayDto> = mutableMapOf()
         informationOverlays.forEach {
@@ -70,7 +70,7 @@ class Schema(
             labelOverlayDtos.toMap(),
             formatOverlayDtos.toMap(),
             entryOverlayDtos.toMap(),
-            encodeOverlayDtos.toMap(),
+            characterEncodingOverlayDtos.toMap(),
             informationOverlayDtos.toMap()
         )
     }
@@ -128,13 +128,13 @@ class Schema(
                 tmp.forEach { overlay.attrEntries.put(it.key, it.value) }
             }
         }
-        if (encodeOverlays.isNotEmpty()) {
-            encodeOverlays.forEach { overlay ->
-                val tmp = overlay.attrEncoding.mapKeys { entries ->
+        if (characterEncodingOverlays.isNotEmpty()) {
+            characterEncodingOverlays.forEach { overlay ->
+                val tmp = overlay.attrCharacterEncoding.mapKeys { entries ->
                     schemaBase.attributesUuid.filterValues { it == entries.key }.keys.first()
                 }
-                overlay.attrEncoding.clear()
-                tmp.forEach { overlay.attrEncoding.put(it.key, it.value) }
+                overlay.attrCharacterEncoding.clear()
+                tmp.forEach { overlay.attrCharacterEncoding.put(it.key, it.value) }
             }
         }
         if (informationOverlays.isNotEmpty()) {
@@ -198,17 +198,17 @@ class Schema(
             }
             entryOverlay.add(attribute)
         }
-        if (attribute.encoding != null) {
-            var encodeOverlay = encodeOverlays.find { it.role == role && it.purpose == purpose }
-            if (encodeOverlay == null) {
-                encodeOverlay = EncodeOverlay(
-                    EncodeOverlayDto(
+        if (attribute.characterEncoding != null) {
+            var characterEncodingOverlay = characterEncodingOverlays.find { it.role == role && it.purpose == purpose }
+            if (characterEncodingOverlay == null) {
+                characterEncodingOverlay = CharacterEncodingOverlay(
+                    CharacterEncodingOverlayDto(
                         role = role, purpose = purpose
                     )
                 )
-                encodeOverlays.add(encodeOverlay)
+                characterEncodingOverlays.add(characterEncodingOverlay)
             }
-            encodeOverlay.add(attribute)
+            characterEncodingOverlay.add(attribute)
         }
         if (attribute.information != null) {
             var informationOverlay = informationOverlays.find { it.role == role && it.purpose == purpose }
@@ -282,17 +282,17 @@ class Schema(
             }
         }
 
-        if (attribute.encoding != null) {
-            var encodeOverlay = encodeOverlays.find { it.role == role && it.purpose == purpose }
-            if (encodeOverlay == null) {
-                encodeOverlay = EncodeOverlay(
-                    EncodeOverlayDto(
+        if (attribute.characterEncoding != null) {
+            var characterEncodingOverlay = characterEncodingOverlays.find { it.role == role && it.purpose == purpose }
+            if (characterEncodingOverlay == null) {
+                characterEncodingOverlay = CharacterEncodingOverlay(
+                    CharacterEncodingOverlayDto(
                         role = role, purpose = purpose
                     )
                 )
-                encodeOverlays.add(encodeOverlay)
+                characterEncodingOverlays.add(characterEncodingOverlay)
             }
-            encodeOverlay.modify(uuid, attribute)
+            characterEncodingOverlay.modify(uuid, attribute)
         }
 
         if (attribute.information != null) {
@@ -338,8 +338,8 @@ class Schema(
             overlay.delete(uuid)
         }
 
-        var encodeOverlay = encodeOverlays.find { it.role == role && it.purpose == purpose }
-        encodeOverlay?.delete(uuid)
+        var characterEncodingOverlay = characterEncodingOverlays.find { it.role == role && it.purpose == purpose }
+        characterEncodingOverlay?.delete(uuid)
 
         informationOverlays.forEach { overlay ->
             overlay.delete(uuid)
