@@ -92,20 +92,20 @@ data class LabelOverlay(
 
     private fun getOrCreateCategoryAttr(supercategoryNumbers: List<String>, category: String) : String {
         val nestedCategoryNumbers = if (supercategoryNumbers.size > 0)
-            ("_" + supercategoryNumbers.joinToString("_") + "_") else "_"
+            ("-" + supercategoryNumbers.joinToString("-") + "-") else "-"
 
         var categoryAttr = categoryLabels.filter {
             it.value == category
-            && it.key.matches(Regex("_category$nestedCategoryNumbers[1-9]_"))
+            && it.key.matches(Regex("_cat$nestedCategoryNumbers[1-9]_"))
         }.keys
 
         if (categoryAttr.size > 0) {
             return categoryAttr.first()
         } else {
             val subcategoryNumber = categoryLabels.count {
-                it.key.matches(Regex("_category$nestedCategoryNumbers[1-9]_"))
+                it.key.matches(Regex("_cat$nestedCategoryNumbers[1-9]_"))
             } + 1
-            return "_category${nestedCategoryNumbers}${subcategoryNumber}_"
+            return "_cat${nestedCategoryNumbers}${subcategoryNumber}_"
         }
     }
 }
