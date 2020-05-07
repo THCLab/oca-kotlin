@@ -160,18 +160,48 @@ class Schema(
         val role = ""
         val purpose = ""
 
-        if (attribute.label != null) {
-            var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
-            if (labelOverlay == null) {
-                labelOverlay = LabelOverlay(
-                    LabelOverlayDto(
-                        role = role, purpose = purpose, language = "en_US"
-                    )
-                )
-                labelOverlays.add(labelOverlay)
-            }
+        attribute.translations?.forEach { translation ->
+          val translationLang = translation.key
 
-            labelOverlay.add(attribute)
+          if (translation.value["label"] != null) {
+              var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose && it.language == translationLang }
+              if (labelOverlay == null) {
+                  labelOverlay = LabelOverlay(
+                      LabelOverlayDto(
+                          role = role, purpose = purpose, language = translationLang
+                      )
+                  )
+                  labelOverlays.add(labelOverlay)
+              }
+
+              labelOverlay.add(attribute)
+          }
+
+          if (translation.value["information"] != null) {
+              var informationOverlay = informationOverlays.find { it.role == role && it.purpose == purpose && it.language == translationLang }
+              if (informationOverlay == null) {
+                  informationOverlay = InformationOverlay(
+                      InformationOverlayDto(
+                          role = role, purpose = purpose, language = translationLang
+                      )
+                  )
+                  informationOverlays.add(informationOverlay)
+              }
+              informationOverlay.add(attribute)
+          }
+
+          if (translation.value["entry"] != null) {
+              var entryOverlay = entryOverlays.find { it.role == role && it.purpose == purpose && it.language == translationLang}
+              if (entryOverlay == null) {
+                  entryOverlay = EntryOverlay(
+                      EntryOverlayDto(
+                          role = role, purpose = purpose, language = translationLang
+                      )
+                  )
+                  entryOverlays.add(entryOverlay)
+              }
+              entryOverlay.add(attribute)
+          }
         }
 
         if (attribute.format != null) {
@@ -186,18 +216,6 @@ class Schema(
             }
             formatOverlay.add(attribute)
         }
-        if (attribute.entries != null) {
-            var entryOverlay = entryOverlays.find { it.role == role && it.purpose == purpose }
-            if (entryOverlay == null) {
-                entryOverlay = EntryOverlay(
-                    EntryOverlayDto(
-                        role = role, purpose = purpose, language = "en_US"
-                    )
-                )
-                entryOverlays.add(entryOverlay)
-            }
-            entryOverlay.add(attribute)
-        }
         if (attribute.characterEncoding != null) {
             var characterEncodingOverlay = characterEncodingOverlays.find { it.role == role && it.purpose == purpose }
             if (characterEncodingOverlay == null) {
@@ -210,18 +228,6 @@ class Schema(
             }
             characterEncodingOverlay.add(attribute)
         }
-        if (attribute.information != null) {
-            var informationOverlay = informationOverlays.find { it.role == role && it.purpose == purpose }
-            if (informationOverlay == null) {
-                informationOverlay = InformationOverlay(
-                    InformationOverlayDto(
-                        role = role, purpose = purpose, language = "en_US"
-                    )
-                )
-                informationOverlays.add(informationOverlay)
-            }
-            informationOverlay.add(attribute)
-        }
     }
 
     @JsName("modify")
@@ -231,17 +237,69 @@ class Schema(
         val role = ""
         val purpose = ""
 
-        if (attribute.label != null) {
-            var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
-            if (labelOverlay == null) {
-                labelOverlay = LabelOverlay(
-                    LabelOverlayDto(
-                        role = role, purpose = purpose, language = "en_US"
+        attribute.translations?.forEach { translation ->
+            val translationLang = translation.key
+
+            if (translation.value["label"] != null) {
+                var labelOverlay = labelOverlays.find {
+                    it.role == role && it.purpose == purpose &&
+                    it.language == translationLang
+                }
+                if (labelOverlay == null) {
+                    labelOverlay = LabelOverlay(
+                        LabelOverlayDto(
+                            role = role, purpose = purpose,
+                            language = translationLang
+                        )
                     )
-                )
-                labelOverlays.add(labelOverlay)
+                    labelOverlays.add(labelOverlay)
+                }
+                labelOverlay.modify(uuid, attribute)
             }
-            labelOverlay.modify(uuid, attribute)
+
+            if (translation.value["information"] != null) {
+                var informationOverlay = informationOverlays.find {
+                    it.role == role && it.purpose == purpose &&
+                    it.language == translationLang
+                }
+                if (informationOverlay == null) {
+                    informationOverlay = InformationOverlay(
+                        InformationOverlayDto(
+                            role = role, purpose = purpose,
+                            language = translationLang
+                        )
+                    )
+                    informationOverlays.add(informationOverlay)
+                }
+
+                if (informationOverlay.attrInformation.containsKey(uuid)) {
+                    informationOverlay.modify(uuid, attribute)
+                } else {
+                    informationOverlay.add(attribute, uuid)
+                }
+            }
+
+            if (translation.value["entry"] != null) {
+                var entryOverlay = entryOverlays.find {
+                  it.role == role && it.purpose == purpose &&
+                  it.language == translationLang
+                }
+                if (entryOverlay == null) {
+                    entryOverlay = EntryOverlay(
+                        EntryOverlayDto(
+                            role = role, purpose = purpose,
+                            language = translationLang
+                        )
+                    )
+                    entryOverlays.add(entryOverlay)
+                }
+
+                if (entryOverlay.attrEntries.containsKey(uuid)) {
+                    entryOverlay.modify(uuid, attribute)
+                } else {
+                    entryOverlay.add(attribute, uuid)
+                }
+            }
         }
 
         if (attribute.format != null) {
@@ -257,31 +315,6 @@ class Schema(
             formatOverlay.modify(uuid, attribute)
         }
 
-        if (attribute.entries != null) {
-            var modified = false
-            
-            for (overlay in entryOverlays) {
-                if (overlay.attrEntries.containsKey(uuid)) {
-                    overlay.modify(uuid, attribute)
-                    modified = true
-                    break
-                }
-            }
-
-            if (modified == false) {
-                var entryOverlay = entryOverlays.find { it.role == role && it.purpose == purpose }
-                if (entryOverlay == null) {
-                    entryOverlay = EntryOverlay(
-                        EntryOverlayDto(
-                            role = role, purpose = purpose, language = "en_US"
-                        )
-                    )
-                    entryOverlays.add(entryOverlay)
-                }
-                entryOverlay.add(attribute, uuid)
-            }
-        }
-
         if (attribute.characterEncoding != null) {
             var characterEncodingOverlay = characterEncodingOverlays.find { it.role == role && it.purpose == purpose }
             if (characterEncodingOverlay == null) {
@@ -294,31 +327,6 @@ class Schema(
             }
             characterEncodingOverlay.modify(uuid, attribute)
         }
-
-        if (attribute.information != null) {
-            var modified = false
-            
-            for (overlay in informationOverlays) {
-                if (overlay.attrInformation.containsKey(uuid)) {
-                    overlay.modify(uuid, attribute)
-                    modified = true
-                    break
-                }
-            }
-
-            if (modified == false) {
-                var informationOverlay = informationOverlays.find { it.role == role && it.purpose == purpose }
-                if (informationOverlay == null) {
-                    informationOverlay = InformationOverlay(
-                        InformationOverlayDto(
-                            role = role, purpose = purpose, language = "en_US"
-                        )
-                    )
-                    informationOverlays.add(informationOverlay)
-                }
-                informationOverlay.add(attribute, uuid)
-            }
-        }
     }
 
     @JsName("delete")
@@ -328,21 +336,16 @@ class Schema(
         val role = ""
         val purpose = ""
 
-        var labelOverlay = labelOverlays.find { it.role == role && it.purpose == purpose }
-        labelOverlay?.delete(uuid)
+        labelOverlays.forEach { overlay -> overlay.delete(uuid) }
+
+        informationOverlays.forEach { overlay -> overlay.delete(uuid) }
+
+        entryOverlays.forEach { overlay -> overlay.delete(uuid) }
 
         var formatOverlay = formatOverlays.find { it.role == role && it.purpose == purpose }
         formatOverlay?.delete(uuid)
 
-        entryOverlays.forEach { overlay ->
-            overlay.delete(uuid)
-        }
-
         var characterEncodingOverlay = characterEncodingOverlays.find { it.role == role && it.purpose == purpose }
         characterEncodingOverlay?.delete(uuid)
-
-        informationOverlays.forEach { overlay ->
-            overlay.delete(uuid)
-        }
     }
 }

@@ -7,6 +7,7 @@ data class EntryOverlay(
 ) { 
     val role = entryOverlayDto.role
     val purpose = entryOverlayDto.purpose
+    val language = entryOverlayDto.language
     val attrEntries: MutableMap<String, MutableList<String>> = entryOverlayDto.attrEntries.toMutableMap()
 
     fun toDto(schemaBaseId: String, attributesUuid: MutableMap<String, String>): EntryOverlayDto {
@@ -17,7 +18,7 @@ data class EntryOverlay(
             role = role,
             purpose = purpose,
             schemaBaseId = schemaBaseId,
-            language = entryOverlayDto.language,
+            language = language,
             attrEntries = attrEntries.mapKeys {
                 attributesUuid[it.key] as String
             }
@@ -25,15 +26,19 @@ data class EntryOverlay(
     }
 
     fun add(attribute: AttributeDto, uuid: String = attribute.uuid) {
-        if (attribute.entries == null) { throw Exception() }
-        
-        attrEntries.put(uuid, attribute.entries.toMutableList())
+        val translation = attribute.translations?.get(language)
+        if (translation?.get("entry") == null) { throw Exception() }
+        val entries = translation["entry"] as Array<String>
+
+        attrEntries.put(uuid, entries?.toMutableList())
     }
 
     fun modify(uuid: String, attribute: AttributeDto) {
-        if (attribute.entries == null) { throw Exception() }
+        val translation = attribute.translations?.get(language)
+        if (translation?.get("entry") == null) { throw Exception() }
+        val entries = translation["entry"] as Array<String>
 
-        attrEntries.set(uuid, attribute.entries.toMutableList())
+        attrEntries.set(uuid, entries.toMutableList())
     }
 
     fun delete(uuid: String) {

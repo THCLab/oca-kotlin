@@ -5,8 +5,8 @@ import kotlinx.serialization.*
 
 data class AttributeDto(
     val name: String, val type: String, val isPii: Boolean,
-    val categories: Array<String>?, val label: String?, val format: String?,
-    val entries: Array<String>?, val characterEncoding: String?, val information: String?
+    val translations: Map<String, Map<String, Any>>?,
+    val format: String?, val characterEncoding: String?
 ) {
     val uuid: String
 

@@ -7,6 +7,7 @@ data class InformationOverlay(
 ) { 
     val role = informationOverlayDto.role
     val purpose = informationOverlayDto.purpose
+    val language = informationOverlayDto.language
     val attrInformation: MutableMap<String, String> = informationOverlayDto.attrInformation.toMutableMap()
 
     fun toDto(schemaBaseId: String, attributesUuid: MutableMap<String, String>): InformationOverlayDto {
@@ -17,7 +18,7 @@ data class InformationOverlay(
             role = role,
             purpose = purpose,
             schemaBaseId = schemaBaseId,
-            language = informationOverlayDto.language,
+            language = language,
             attrInformation = attrInformation.mapKeys {
                 attributesUuid[it.key] as String
             }
@@ -25,15 +26,19 @@ data class InformationOverlay(
     }
 
     fun add(attribute: AttributeDto, uuid: String = attribute.uuid) {
-        if (attribute.information == null) { throw Exception() }
-        
-        attrInformation.put(uuid, attribute.information)
+        val translation = attribute.translations?.get(language)
+        if (translation?.get("information") == null) { throw Exception() }
+        val information = translation["information"] as String
+
+        attrInformation.put(uuid, information)
     }
 
     fun modify(uuid: String, attribute: AttributeDto) {
-        if (attribute.information == null) { throw Exception() }
+        val translation = attribute.translations?.get(language)
+        if (translation?.get("information") == null) { throw Exception() }
+        val information = translation["information"] as String
 
-        attrInformation.set(uuid, attribute.information)
+        attrInformation.set(uuid, information)
     }
 
     fun delete(uuid: String) {

@@ -7,6 +7,7 @@ data class LabelOverlay(
 ) { 
     val role = labelOverlayDto.role
     val purpose = labelOverlayDto.purpose
+    val language = labelOverlayDto.language
     val attrLabels: MutableMap<String, String> = labelOverlayDto.attrLabels.toMutableMap()
     val attrCategories: MutableList<String> = labelOverlayDto.attrCategories.toMutableList()
     val categoryLabels: MutableMap<String, String> = labelOverlayDto.categoryLabels.toMutableMap()
@@ -26,7 +27,7 @@ data class LabelOverlay(
             role = role,
             purpose = purpose,
             schemaBaseId = schemaBaseId,
-            language = labelOverlayDto.language,
+            language = language,
             attrLabels = attrLabels.mapKeys {
                 attributesUuid[it.key] as String
             },
@@ -37,12 +38,14 @@ data class LabelOverlay(
     }
 
     fun add(attribute: AttributeDto, uuid: String = attribute.uuid) {
-        if (attribute.label == null || attribute.categories == null) {
+        val translation = attribute.translations?.get(language)
+
+        if (translation?.get("label") == null || translation["categories"] == null) {
             throw Exception()
         }
-        val label = attribute.label
-        val categories = attribute.categories
-        
+        val label = translation["label"] as String
+        val categories = translation["categories"] as Array<String>
+
         attrLabels.put(uuid, label)
 
         val category = categories.last()
