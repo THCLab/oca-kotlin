@@ -1,6 +1,4 @@
-package com.thehumancolossuslab.odca
-
-import kotlinx.serialization.json.*
+package com.thehumancolossuslab.oca
 
 object Hello {
     @JvmStatic

@@ -1,4 +1,4 @@
-package com.thehumancolossuslab.odca
+package com.thehumancolossuslab.oca
 
 import kotlinx.serialization.*
 
@@ -13,6 +13,6 @@ data class LabelOverlayDto(
     val language: String,
     @SerialName("attr_labels") val attrLabels: Map<String, String> = mapOf(),
     @SerialName("attr_categories") val attrCategories: List<String> = listOf(),
-    @SerialName("category_labels") val categoryLabels: Map<String, String> = mapOf(),
-    @SerialName("category_attributes") val categoryAttributes: Map<String, MutableList<String>> = mapOf()
+    @SerialName("cat_labels") val categoryLabels: Map<String, String> = mapOf(),
+    @SerialName("cat_attributes") val categoryAttributes: Map<String, MutableList<String>> = mapOf()
 )

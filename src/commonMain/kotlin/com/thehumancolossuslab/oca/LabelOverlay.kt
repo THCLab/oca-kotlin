@@ -1,12 +1,11 @@
-package com.thehumancolossuslab.odca
-
-import kotlinx.serialization.*
+package com.thehumancolossuslab.oca
 
 data class LabelOverlay(
     private val labelOverlayDto: LabelOverlayDto
 ) { 
     val role = labelOverlayDto.role
     val purpose = labelOverlayDto.purpose
+    val language = labelOverlayDto.language
     val attrLabels: MutableMap<String, String> = labelOverlayDto.attrLabels.toMutableMap()
     val attrCategories: MutableList<String> = labelOverlayDto.attrCategories.toMutableList()
     val categoryLabels: MutableMap<String, String> = labelOverlayDto.categoryLabels.toMutableMap()
@@ -26,7 +25,7 @@ data class LabelOverlay(
             role = role,
             purpose = purpose,
             schemaBaseId = schemaBaseId,
-            language = labelOverlayDto.language,
+            language = language,
             attrLabels = attrLabels.mapKeys {
                 attributesUuid[it.key] as String
             },
@@ -37,16 +36,35 @@ data class LabelOverlay(
     }
 
     fun add(attribute: AttributeDto, uuid: String = attribute.uuid) {
-        if (attribute.label == null) { throw Exception() }
-        var (category, label) = splitInput(attribute.label)
-        
-        attrLabels.put(uuid, label)
-        if (category.isNotBlank()) {
-            var categoryAttr = snakeCase(category)
-            attrCategories.add(categoryAttr)
-            categoryLabels.put(categoryAttr, category)
-            categoryAttributes.getOrPut(categoryAttr) { mutableListOf() }.add(uuid)
+        val translation = attribute.translations?.get(language)
+
+        if (translation?.get("label") == null || translation["categories"] == null) {
+            throw Exception()
         }
+        val label = translation["label"] as String
+        val categories = translation["categories"] as Array<String>
+
+        attrLabels.put(uuid, label)
+
+        val category = categories.last()
+        val supercategories = categories.dropLast(1)
+
+        var supercategoryNumbers : MutableList<String> = mutableListOf()
+        for (supercategory in supercategories) {
+            val supercategoryAttr = getOrCreateCategoryAttr(supercategoryNumbers, supercategory)
+            supercategoryNumbers.add(supercategoryAttr.dropLast(1).last().toString())
+            if (supercategoryAttr !in attrCategories) {
+                attrCategories.add(supercategoryAttr)
+            }
+            categoryLabels.put(supercategoryAttr, supercategory)
+        }
+
+        var categoryAttr = getOrCreateCategoryAttr(supercategoryNumbers, category)
+        if (categoryAttr !in attrCategories) {
+            attrCategories.add(categoryAttr)
+        }
+        categoryLabels.put(categoryAttr, category)
+        categoryAttributes.getOrPut(categoryAttr) { mutableListOf() }.add(uuid)
     }
 
     fun modify(uuid: String, attribute: AttributeDto) {
@@ -73,15 +91,22 @@ data class LabelOverlay(
         }
     }
 
-    private fun splitInput(input: String) : List<String> {
-        var result = input.split("|").map { it.trim() }
-        if (result.size == 1) {
-            result = listOf("") + result
-        }
-        return result
-    }
+    private fun getOrCreateCategoryAttr(supercategoryNumbers: List<String>, category: String) : String {
+        val nestedCategoryNumbers = if (supercategoryNumbers.size > 0)
+            ("-" + supercategoryNumbers.joinToString("-") + "-") else "-"
 
-    private fun snakeCase(input: String) : String {
-        return input.toLowerCase().replace(" ", "_")
+        var categoryAttr = categoryLabels.filter {
+            it.value == category
+            && it.key.matches(Regex("_cat$nestedCategoryNumbers[1-9]_"))
+        }.keys
+
+        if (categoryAttr.size > 0) {
+            return categoryAttr.first()
+        } else {
+            val subcategoryNumber = categoryLabels.count {
+                it.key.matches(Regex("_cat$nestedCategoryNumbers[1-9]_"))
+            } + 1
+            return "_cat${nestedCategoryNumbers}${subcategoryNumber}_"
+        }
     }
 }

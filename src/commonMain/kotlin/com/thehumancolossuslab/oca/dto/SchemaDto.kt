@@ -1,4 +1,4 @@
-package com.thehumancolossuslab.odca
+package com.thehumancolossuslab.oca
 
 import kotlinx.serialization.*
 
@@ -8,6 +8,6 @@ class SchemaDto(
     val labelOverlays: Map<String, LabelOverlayDto> = mapOf(),
     val formatOverlays: Map<String, FormatOverlayDto> = mapOf(),
     val entryOverlays: Map<String, EntryOverlayDto> = mapOf(),
-    val encodeOverlays: Map<String, EncodeOverlayDto> = mapOf(),
+    val characterEncodingOverlays: Map<String, CharacterEncodingOverlayDto> = mapOf(),
     val informationOverlays: Map<String, InformationOverlayDto> = mapOf()
 )

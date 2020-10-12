@@ -1,15 +1,14 @@
-package com.thehumancolossuslab.odca
+package com.thehumancolossuslab.oca
 
 import kotlinx.serialization.*
 
 @Serializable
-data class EncodeOverlayDto(
+data class FormatOverlayDto(
     @SerialName("@context") val context: String = "https://odca.tech/overlays/v1",
-    val type: String = "spec/overlay/encode/1.0",
+    val type: String = "spec/overlay/format/1.0",
     @SerialName("issued_by") val issuedBy: String = "",
     val role: String,
     val purpose: String,
     @SerialName("schema_base") var schemaBaseId: String = "",
-    @SerialName("default_encoding") val defaultEncoding: String = "utf-8",
-    @SerialName("attr_encoding") val attrEncoding: Map<String, String> = mapOf()
+    @SerialName("attr_formats") val attrFormats: Map<String, String> = mapOf()
 )

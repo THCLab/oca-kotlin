@@ -18,7 +18,7 @@ plugins {
 }
 
 group 'com.thehumancolossuslab'
-version '0.0.6'
+version '0.0.10'
 
 sourceCompatibility = 1.8
 
@@ -40,7 +40,7 @@ kotlin {
     }.compilations.all {
         kotlinOptions.moduleKind = "commonjs"
         kotlinOptions.sourceMap = false
-        kotlinOptions.outputFile = "$project.buildDir.path/js/packages/${project.name}/lib/odca.js"
+        kotlinOptions.outputFile = "$project.buildDir.path/js/packages/${project.name}/lib/oca.js"
         kotlinOptions.main = "noCall"
         kotlinOptions.metaInfo = true
     }
@@ -105,7 +105,7 @@ jvmTest {
 }
 
 task run(type: JavaExec) {
-    main = 'com.thehumancolossuslab.odca.Hello'
+    main = 'com.thehumancolossuslab.oca.Hello'
     def target = kotlin.targets.jvm
     def compilation = target.compilations.main
 
@@ -119,11 +119,12 @@ task run(type: JavaExec) {
 task packageJSON(){
     doLast {
         new File("$buildDir/js/packages/${project.name}", "package.json").text = """{
-  "name": "odca",
+  "name": "oca.js",
   "version": "$version",
-  "main": "./lib/odca",
+  "main": "dist/main.js",
     "scripts": {
-    "preinstall": "command -v link-module-alias && link-module-alias clean || true",
+    "build": "webpack",
+    "preinstall": "command -v link-module-alias; link-module-alias clean || true",
     "postinstall": "link-module-alias"
   },
   "_moduleAliases": {
@@ -135,8 +136,52 @@ task packageJSON(){
   "dependencies": {
     "kotlin": "^$kotlin_version",
     "link-module-alias": "^1.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "babel-loader": "^8.1.0",
+    "path": "^0.12.7",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-node-externals": "^1.7.2"
   }
 }
+"""
+
+        new File("$buildDir/js/packages/${project.name}", "webpack.config.js").text = """
+const webpack = require('webpack');
+const path = require('path');
+var nodeExternals = require('webpack-node-externals');
+
+module.exports = {
+  mode: 'production',
+  entry: path.resolve(__dirname + '/lib/oca.js'),
+  output: {
+    path: path.resolve(__dirname + '/dist/'),
+    filename: 'main.js',
+
+    libraryTarget: 'umd',
+    library: 'oca'
+  },
+  module: {
+    rules: [
+      {
+        test: /.js/,
+        use: 'babel-loader',
+        include: __dirname,
+        exclude: /node_modules/
+      }
+    ]
+  },
+  externals: [nodeExternals()]
+};
+"""
+
+        new File("$buildDir/js/packages/${project.name}", ".npmignore").text = """
+node_modules
+lib
+yarn.lock
+webpack.config.js
 """
     }
 }

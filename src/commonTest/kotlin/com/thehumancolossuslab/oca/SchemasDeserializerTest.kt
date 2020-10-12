@@ -1,9 +1,4 @@
-package com.thehumancolossuslab.odca
-
-import com.thehumancolossuslab.odca.SchemasDeserializer
-import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
-import kotlin.test.assertEquals
+package com.thehumancolossuslab.oca
 
 // object AClassSpec: Spek({
 //     val calculator by memoized { AClass(3) }
