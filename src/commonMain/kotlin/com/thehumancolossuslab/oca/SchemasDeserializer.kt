@@ -1,6 +1,5 @@
-package com.thehumancolossuslab.odca
+package com.thehumancolossuslab.oca
 
-import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 class SchemasDeserializer(val schemasData: Array<HashMap<String, String>>) {

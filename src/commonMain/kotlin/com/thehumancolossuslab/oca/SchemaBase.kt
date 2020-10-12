@@ -1,4 +1,4 @@
-package com.thehumancolossuslab.odca
+package com.thehumancolossuslab.oca
 
 data class SchemaBase(
     val schemaBaseDto: SchemaBaseDto

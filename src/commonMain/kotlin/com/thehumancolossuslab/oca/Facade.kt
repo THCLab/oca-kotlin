@@ -1,4 +1,4 @@
-package com.thehumancolossuslab.odca
+package com.thehumancolossuslab.oca
 
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json

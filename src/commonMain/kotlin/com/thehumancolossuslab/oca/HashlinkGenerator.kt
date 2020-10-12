@@ -1,4 +1,4 @@
-package com.thehumancolossuslab.odca
+package com.thehumancolossuslab.oca
 
 import com.ionspin.kotlin.bignum.integer.toBigInteger
 import com.soywiz.krypto.SHA256

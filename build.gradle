@@ -40,7 +40,7 @@ kotlin {
     }.compilations.all {
         kotlinOptions.moduleKind = "commonjs"
         kotlinOptions.sourceMap = false
-        kotlinOptions.outputFile = "$project.buildDir.path/js/packages/${project.name}/lib/odca.js"
+        kotlinOptions.outputFile = "$project.buildDir.path/js/packages/${project.name}/lib/oca.js"
         kotlinOptions.main = "noCall"
         kotlinOptions.metaInfo = true
     }
@@ -105,7 +105,7 @@ jvmTest {
 }
 
 task run(type: JavaExec) {
-    main = 'com.thehumancolossuslab.odca.Hello'
+    main = 'com.thehumancolossuslab.oca.Hello'
     def target = kotlin.targets.jvm
     def compilation = target.compilations.main
 
@@ -119,7 +119,7 @@ task run(type: JavaExec) {
 task packageJSON(){
     doLast {
         new File("$buildDir/js/packages/${project.name}", "package.json").text = """{
-  "name": "odca",
+  "name": "oca.js",
   "version": "$version",
   "main": "dist/main.js",
     "scripts": {
@@ -155,13 +155,13 @@ var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   mode: 'production',
-  entry: path.resolve(__dirname + '/lib/odca.js'),
+  entry: path.resolve(__dirname + '/lib/oca.js'),
   output: {
     path: path.resolve(__dirname + '/dist/'),
     filename: 'main.js',
 
     libraryTarget: 'umd',
-    library: 'odca'
+    library: 'oca'
   },
   module: {
     rules: [

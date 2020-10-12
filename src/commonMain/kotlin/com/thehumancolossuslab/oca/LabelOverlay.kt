@@ -1,6 +1,4 @@
-package com.thehumancolossuslab.odca
-
-import kotlinx.serialization.*
+package com.thehumancolossuslab.oca
 
 data class LabelOverlay(
     private val labelOverlayDto: LabelOverlayDto

@@ -1,7 +1,6 @@
-package com.thehumancolossuslab.odca
+package com.thehumancolossuslab.oca
 
 import com.benasher44.uuid.uuid4
-import kotlinx.serialization.*
 
 data class AttributeDto(
     val name: String, val type: String, val isPii: Boolean,
