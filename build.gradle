@@ -127,15 +127,13 @@ task packageJSON(){
     "preinstall": "command -v link-module-alias; link-module-alias clean || true",
     "postinstall": "link-module-alias"
   },
-  "_moduleAliases": {
-    "kotlinx-serialization-kotlinx-serialization-runtime": "dependencies/kotlinx-serialization-kotlinx-serialization-runtime/$serialization_version",
-    "bignum": "dependencies/bignum/0.1.4-SNAPSHOT",
-    "krypto-root-krypto": "dependencies/krypto-root-krypto/1.9.0",
-    "uuid": "dependencies/uuid/0.0.5"
-  },
   "dependencies": {
     "kotlin": "^$kotlin_version",
-    "link-module-alias": "^1.2.0"
+    "link-module-alias": "^1.2.0",
+    "kotlinx-serialization-kotlinx-serialization-runtime": "file:./dependencies/kotlinx-serialization-kotlinx-serialization-runtime/$serialization_version",
+    "bignum": "file:./dependencies/bignum/0.1.4-SNAPSHOT",
+    "krypto-root-krypto": "file:./dependencies/krypto-root-krypto/1.9.0",
+    "uuid": "file:./dependencies/uuid/0.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
